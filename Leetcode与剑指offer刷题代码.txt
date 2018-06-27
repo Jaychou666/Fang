@@ -1,0 +1,868 @@
+#include<iostream>
+#include<sstream>
+#include<vector>
+#include<string>
+#include<list>
+#include <numeric>
+#include<set>
+#include<regex>
+#include<algorithm>
+#include<unordered_map>
+#include<map>
+using namespace::std;
+int sum;
+struct TreeNode {
+	int val;
+	struct TreeNode *left;
+	struct TreeNode *right;
+	TreeNode(int x) :
+		val(x), left(NULL), right(NULL) {
+	}
+};
+ class ListNode {
+ public:
+   int val;
+   ListNode *next;
+   ListNode(int x) : val(x), next(NULL) {}
+};
+ ListNode* Reverse(ListNode *root) {
+	 if (root == NULL)return root;
+	 ListNode *newH = NULL;
+	 ListNode *p = root;	
+	 ListNode *temp;
+	 while (p) {
+		temp = p->next;
+		 p->next = newH;
+		 newH = p;
+		 p = temp;
+	 }
+	 return newH;
+ }
+ ListNode *reverseBetween(ListNode *head, int m, int n) {
+	 if (head == NULL || m == n)return head;
+	 ListNode *pm, *pn, *temp; int k = n - m;
+	 ListNode *dump = new ListNode(-1);
+	 dump->next = head;
+	 temp = dump;
+	 while (m>1) {
+		 temp = temp->next;
+		 m--;
+	 }
+	 pm = temp;
+	 for (auto i = 0; i<=k; i++) {
+		 temp = temp->next;
+	 }
+	 pn = temp->next;
+	 temp->next = NULL;
+	 ListNode *newH; ListNode *temp2=pm->next;
+	 newH = Reverse(pm);
+	 pm->next = newH;
+	 temp2->next = pn;  cout << "pm=" << pm->val << endl; cout << "newH=" << newH->val << endl; cout << "pm->next=" << pm->next->val << endl;
+	      cout << "pm=" << pm->val << endl;
+	 
+	 return dump->next;
+ }
+ vector<vector<int> > subsetsWithDup(vector<int> &S) {
+	 sort(S.begin(), S.end());                 //求子集      
+	 vector<vector<int> > rslt;
+	 rslt.push_back(vector<int>());    //add the empty set                
+	 int size = S.size();
+	 for (int i = 0; i < size; i++) {
+		 vector<vector<int> > incVec;  //当前已有的子集           
+		 incVec = rslt;
+		 int len = rslt.size();
+		 for (int j = 0; j < len; j++) {
+			 vector<int> tmpVec = rslt[j];
+			 tmpVec.push_back(S[i]);
+			 if (find(incVec.begin(), incVec.end(), tmpVec) == incVec.end()) {
+				 rslt.push_back(tmpVec);
+			 }
+		 }
+	 }
+	 return rslt;
+ }
+ void merge(vector<int> &A, int m, vector<int> &B, int n) {
+	 int index = m + n - 1;
+	 int i = m - 1, j = n - 1;
+	 while (i >= 0 && j >= 0) {
+		 A[index--] = (A[i]>B[j]) ?  A[i--] : B[j--];
+	 }
+	 while (j >= 0) {
+		 A[index--] = B[j--];
+	 }
+ }
+ ListNode *partition(ListNode *head, int x) {
+	 ListNode *head1=new ListNode(-1), *head2=new ListNode(-1),*temp1=head1,*temp2=head2 ,*cur = head;
+	
+	 while (cur) {
+		 if (cur->val<x) {
+			 head1->next = cur; head1 = head1->next;
+		 }
+		 if (cur->val >= x) {
+			 head2->next = cur; head2 = head2->next;
+		 }
+		 cur = cur->next;
+	 }
+	 head1->next = temp2->next;
+	 head2->next = NULL;
+	 return temp1->next;
+ }
+ int maximalRectangle(vector<vector<char> > &matrix) {
+	 int len = 0, weight = 0, w_left = INT_MAX, w_right = -1, S;
+	 for (int i = 0; i<matrix.size(); i++) {
+		 vector<char> num;
+		 for (int j = 0; j<matrix[i].size(); j++) {
+			 if (matrix[i][j] == '1')num.push_back(j);
+		 }
+		 if (w_left>num[0])w_left = num[0];
+		 if (w_right<num[num.size() - 1])w_right = num[num.size() - 1];
+		 if (num.size() != 0)len++;
+	 }
+	 weight = w_right - w_left + 1;
+	 return  S = len*weight;
+ }
+ string minWindow(string S, string T) {
+	 if (T.size() > S.size()) return "";
+	 string res = "";
+	 int left = 0, count = 0, minLen = S.size() + 1;
+	 unordered_map<char, int> m;
+	 for (int i = 0; i < T.size(); ++i) {
+		 if (m.find(T[i]) != m.end()) ++m[T[i]];
+		 else m[T[i]] = 1;
+	 }
+	 for (int right = 0; right < S.size(); ++right) {
+		 cout << "A=" << m['A'] << "B=" << m['B'] << "C=" << m['C'] << endl; cout << "更新前left=" << left << "  " << "更新前right=" << right << "更新后count=" << count << endl;
+		 if (m.find(S[right]) != m.end()) {
+			 --m[S[right]]; cout << S[right] << "=" << m[S[right]] << endl;
+			 if (m[S[right]] >= 0) ++count;
+			 while (count == T.size()) {
+				 if (right - left + 1 < minLen) {
+					 minLen = right - left + 1;
+					 res = S.substr(left, minLen);
+				 }
+				 if (m.find(S[left]) != m.end()) {
+					 ++m[S[left]];
+					 if (m[S[left]] > 0) --count;
+				 }
+				 ++left; cout << "更新后left=" << left << "  " << "更新后right=" << right <<"更新后count="<<count<< endl;
+			 }
+		 }
+	 }
+	 return res;
+ }
+ string simplifyPath(string path) {
+	 string res, tmp;
+	 vector<string> stk;
+	 stringstream ss(path);
+	 while (getline(ss, tmp, '/'))
+	 {    
+		 cout <<tmp << endl;
+		 if (tmp == "" || tmp == ".")
+			 continue;
+		 if (tmp == ".." && !stk.empty())
+			 stk.pop_back();
+		 else if (tmp != "..")
+			 stk.push_back(tmp);
+	 }
+	 for (auto str : stk)
+		 res += "/" + str;
+	 return res.empty() ? "/" : res;
+ }
+ int Find(int left, int right, int x) {
+	 	 int mid =( right+left)/ 2;
+		 if (mid == 0)return x;
+	 if (mid==x/mid)return mid;
+	 else if (x/mid < mid)
+		 return Find(left, mid, x);
+	 else  return Find(mid, right, x);
+ }
+ int sqrt(int x) {
+	 int res = Find(0, x, x);
+	 return res;
+ }
+ string addBinary(string a, string b) {
+	 int a1 = stoi(a, 0, 2);
+	 int b1 = stoi(b, 0, 2);
+	 int c = a1 + b1;
+	 vector<int> c1; 
+	 while(c!=0)
+	 {
+		 int c0= c % 2;
+		 c1.push_back(c0);
+		 c = c / 2;
+	 }
+	reverse(c1.begin(),c1.end());
+	 for (auto i : c1) {
+		 cout << i;
+   }
+	 cout << endl;
+	 string s;
+	 for (auto i : c1)
+	 {
+		 
+		 s += to_string(i);
+	 }
+	 cout << "s=" << s << endl;
+	 return s;
+ }
+ ListNode *mergeTwoLists(ListNode *l1, ListNode *l2) {
+	 ListNode *newH = new ListNode(0);
+	 ListNode *temp = newH; ListNode *p1 = l1, *p2 = l2;
+	 while (p1!=NULL&&p2!=NULL) {
+		 if (p1->val == p2->val || p1->val<p2->val) {
+			
+			 temp->next = p1;  cout << temp->next->val << "->" << endl;;
+			 p1 = p1->next;  if(p1!=NULL) cout << "p1->val=" << p1->val << endl;
+			// temp->next->next = p2;   cout << temp->next->next->val << "->" << endl;
+		//	 p2 = p2->next;   if (p2 != NULL) cout << "p2->val=" << p2->val << endl;
+			 temp = temp->next;			
+		 }
+		 else {
+			 cout << "else运行了";
+			 temp->next = p2;
+			 p2 = p2->next;
+			// temp->next->next = p1;
+			// p1 = p1->next;
+			 temp = temp->next;
+		 }
+	 }
+	 while (p1 || p2) {
+		 cout << "while运行了" << endl;
+		 if (p1 != NULL&&p2 == NULL) {
+			 temp->next = p1;
+			 temp = temp->next;
+			 p1 = p1->next;
+		 }
+		 if (p1 == NULL&&p2 != NULL) {
+			 temp->next = p2;
+			 temp = temp->next;
+			 p2 = p2->next;
+		 }
+	 }
+	 return newH->next;
+ }
+ int minPathSum(vector<vector<int> > &grid) {
+	 vector<vector<int>> d(grid.size(), vector<int>(grid[0].size()));
+	 int m, n; cout << grid.size() << grid[0].size() << endl;
+	 d[0][0] = grid[0][0];
+	 for (int i = 1; i<grid.size(); i++) {
+		 d[i][0] = d[i - 1][0] + grid[i][0];// cout <<"d["<<i<<"][0]="<< d[i][0]<<endl;
+	 }
+	 for (int j = 1; j<grid[0].size(); j++) {
+		 d[0][j] = d[0][j - 1] + grid[0][j]; // cout << "d[0][" << j << "]=" << d[0][j] << endl;
+	 }
+	 for (m = 1; m<grid.size(); m++) {
+		 for (n = 1; n<grid[0].size(); n++) {
+			 d[m][n] = min(d[m - 1][n], d[m][n - 1]) + grid[m][n]; // cout <<"d["<<m<<"]"<<"["<<n<<"]=" <<d[m][n] << endl;
+		 }
+	 }
+	 return d[m-1][n-1];
+ }
+ ListNode *rotateRight(ListNode *head, int k) {
+	 ListNode *newp = new ListNode(0); newp->next = head;
+	 ListNode *temp1 = newp; ListNode *temp2 = newp;
+	 int count = 0, i = 0;
+	 while (temp1->next) {
+		 temp1 = temp1->next;
+		 count++;
+	 }
+	 if (k%count==0)return head;
+	 else if (k > count)k = k%count;  cout << "k=" << k << endl;   //注意，这里是全题目最关键的一点，k是有可能大于链表长度的，                                                                          
+	 while (i++<count - k) {		    //如果不对k进行处理，会导致链表尾接到链表头部，会无限循环 
+		 temp2 = temp2->next;
+	 }
+	 ListNode *newp1 = temp2->next;
+	 temp2->next = NULL;
+	 temp1->next = head;
+	 return newp1;
+ }
+ string getPermutation(int n, int k) {
+	 string res;
+	 string num = "123456789";
+	 vector<int> f(n, 1);
+	 for (int i = 1; i < n; ++i) {
+		 f[i] = f[i - 1] * i; cout << f[i] << endl;
+	 }
+	 --k;
+	 for (int i = n; i >= 1; --i) {
+		 int j = k / f[i - 1];
+		 k %= f[i - 1];
+		 res.push_back(num[j]);
+		 num.erase(j, 1);
+	 }
+	 return res;
+ }
+ struct Interval {
+	 int start;
+	 int end;
+	 Interval() : start(0), end(0) {}
+	 Interval(int s, int e) : start(s), end(e) {}
+ };
+ bool comp(Interval i1, Interval i2)
+ {
+	 if (i1.start == i2.start)
+		 return i1.end <= i2.end;
+	 return i1.start <= i2.start;
+ }
+vector<Interval> merge(vector<Interval> &intervals) {
+		 vector<Interval> res; int len = intervals.size(), i = 1, j = 0;
+		 sort(intervals.begin(), intervals.end(), comp);
+		 res.push_back(intervals[0]);
+		 while (i<len) {
+			 if (intervals[i].start >res[j].end) {
+				 res.push_back(intervals[i]);
+				 i++; j++;
+			 }
+			 else {
+				 if (intervals[i].end <= res[j].end)i++;
+				 else {
+					 res[j].end = intervals[i].end;
+					 i++;
+				 }
+			 }
+		 }
+		 return res;
+	 }
+bool Isunique(vector<vector<int>> &res, vector<int> &num) {
+	for (int i = 0; i<res.size(); i++) {
+		vector<bool> is(num.size(), 0);
+		for (int j = 0; j<res[i].size(); j++) {
+			if (num[j] == res[i][j]) {
+				is[j] = 1;
+			}
+		}
+		if (find(is.begin(), is.end(), 0) == is.end()) return false;
+	}
+	return true;
+}
+void permutation(vector<vector<int> > &res, vector<int> &num, int s) {
+	if (s == num.size() - 1 && Isunique(res, num))
+		res.push_back(num);
+	else {
+		for (int i = s; i<num.size(); i++) {
+			if (num[s] != num[i]) {
+				swap(num[s], num[i]);
+				permutation(res, num, s + 1);
+				swap(num[s], num[i]);
+			}
+			else permutation(res, num, s + 1);
+		}
+	}
+}
+vector<vector<int> > permuteUnique(vector<int> &num) {
+			vector<vector<int> > res;
+			permutation(res, num, 0);
+			return res;
+		}
+bool isMatch(const char *s, const char *p) {
+			int sLen = strlen(s), sIndex = 0;
+			int pLen = strlen(p), pIndex = 0;
+			int ppre = 0, ipre = 0;
+			bool flag = false;
+			while (sIndex<sLen) {
+				if (s[sIndex] == p[pIndex] || p[pIndex] == '?') {
+					++sIndex, ++pIndex;
+				}
+				else if (p[pIndex] == '*') {
+					ppre = ++pIndex; //跳过并记录*后面开始匹配的索引
+					ipre = sIndex;   //记录s中开始与*后面匹配的索引
+					flag = true;
+				}
+				else {
+					if (flag) {       //无法匹配，在出现*情况下用*弥补
+						sIndex = ++ipre;
+						pIndex = ppre;
+					}
+					else {
+						return false;
+					}
+				}
+			}        while (p[pIndex] == '*') {
+				//将剩余的*匹配掉          
+				++pIndex;
+			}
+			return pIndex == pLen&&sIndex == sLen;
+		}
+string multiply(string num1, string num2) {
+			int i = stoi(num1), j = stoi(num2);
+			int res = i*j;
+			string result = to_string(res);
+			return result;
+		}
+string countAndSay(int n) {
+	if (n == 1)return "1";
+	string cur = countAndSay(n - 1) + "*"; cout << "cur=" <<cur <<endl; //让cur的大小比实际多一个，为了下面统一处理结果方便
+	int count = 1; string s = "";
+	for (int i = 0; i<cur.size() - 1; i++) {
+		if (cur[i] == cur[i + 1])count++;
+		else {
+			cout << "pres=" << s << endl;
+			s = s + to_string(count) + cur[i];  
+			cout << "heads=" << s << endl;    //上面cur多了一个*的作用在这里体现出来，方便s的表达+cur[i]代表最后一个重复的数字
+			count = 1;  //重新将计数器初始化为1
+		}
+	}
+	return s;
+}
+ListNode *removeNthFromEnd(ListNode *head, int n) {
+	if (n == 0)return head;
+	ListNode *newH = new ListNode(-1);
+	ListNode *p = newH;
+	p->next = head;
+	int c1 = 0, c2 = 0;
+	while (p) {
+		c1++;
+		p = p->next;
+	}
+	p = newH;
+	while (c2 != c1 - n-1) {
+		c2++;
+		p = p->next; cout << "is" << endl;
+	}
+	cout <<"p="<< p->val << endl;
+	p->next = p->next->next;
+	return newH->next;
+}
+unordered_map<char, string> mp = { { '2',"abc" },{ '3',"def" },{ '4',"ghi" },{ '5',"jkl" },{ '6',"mno" },{ '7',"pqrs" },{ '8',"tuv" },{ '9',"wxyz" } };
+vector<string> letterCombinations(string digits) {
+	vector<string>res = { "" };
+	for (auto c : digits) {
+		int sz = res.size(); cout << sz << endl;
+		for (int i = 0; i<sz; i++)
+			for (auto t : mp[c]) {
+				res.push_back(res[i] + t); cout << res[i] << endl;
+			}
+		res.erase(res.begin(), res.begin() + sz); 
+	}
+	return res;
+}
+void DFS(vector<int> &num, set<vector<int>> &res, vector<int> &temp, int target, int step) {
+	if (temp.size() == 4 && sum != target) return;
+	if (temp.size() == 4 && sum == target) {
+		res.insert(temp);
+	}
+	else {
+		for (int j = step; j<num.size(); j++) {
+			temp.push_back(num[j]); sum = accumulate(temp.begin(), temp.end(), 0);
+			DFS(num, res, temp, target, j + 1);
+			temp.pop_back();
+		}
+	}
+}
+vector<vector<int> > fourSum(vector<int> &num, int target) {
+	set<vector<int>> res; vector<vector<int>>result;
+	vector<int>temp;
+	sort(num.begin(), num.end());
+	DFS(num, res, temp, target, 0);
+	for (auto i : res) {
+		result.push_back(i);
+	}
+	return result;
+}
+int reverse(int x) {
+	if (x==0)return 0;
+	vector<int> vec;
+	int result = 0, bit,x1=abs(x);
+		while (x1 > 0) {
+			bit = x1 % 10;
+			vec.push_back(bit);
+			x1 = x1 / 10; cout << "x1=" << x1 << endl;
+		}
+		int n = vec.size();		
+		for (auto i = 0; i < vec.size(); i++) {
+			result += vec[i] * pow(10, n - 1); cout << "表达式=" << pow(10, n - 1) << ", n=" << n << endl;
+			n--;
+		}
+		if (x > 0)return result;
+		else return -result;
+
+	
+}
+int Fibonacci(int n) {
+	if (n == 1 || n == 2)return 1;
+	else return (Fibonacci(n - 1) + Fibonacci(n - 2));
+}
+double Power(double base, int exponent) {
+	long long p = abs((long long)exponent);
+	double r = 1.0;
+	while (p) {
+		if (p & 1) {
+			r *= base; cout << "r=" << r << endl;
+		} //保证p不等于0，更新计算结果保存在r中  
+		base *= base; cout << "base=" << base << endl;
+		p >>= 1;  cout << "p=" << p << endl; //相当于 int) p=p/2
+	}
+	return (exponent > 0) ? r : 1 / r;
+}
+vector<TreeNode*> vec;
+void inorder(TreeNode* root) {  //中序遍历将树的节点存入容器中
+	if (root) {
+		inorder(root->left);
+		vec.push_back(root);
+		inorder(root->right);
+	}
+}
+TreeNode* Convert(TreeNode* pRootOfTree) {
+	if (pRootOfTree == NULL)return NULL;
+	inorder(pRootOfTree);
+	for (int i = 0; i<vec.size(); i++) {
+		if (i == 0 && vec.size() == 1) {
+			vec[0]->left = vec[0];
+			vec[0]->right = vec[0];
+		}
+		else if (i == 0 && vec.size()>1) {
+			vec[i]->left = NULL;
+			vec[i]->right = vec[i + 1];
+		}
+		else if (i == vec.size() - 1) {
+			vec[i]->right = NULL;
+			vec[i]->left = vec[i - 1];
+		}
+		else {
+			vec[i]->right = vec[i + 1];
+			vec[i]->left = vec[i - 1];
+		}
+	}
+	return vec[0];
+}
+/*class tree111 {
+TreeNode *p1 = new TreeNode(2); TreeNode *p2 = new TreeNode(4);
+	TreeNode *p3 = new TreeNode(5);
+	TreeNode *p4 = new TreeNode(6); TreeNode *p6 = new TreeNode(9);
+	TreeNode *p5 = new TreeNode(7); TreeNode *p7 = new TreeNode(10);
+	p4->left = p2; p4->right = p6;
+	p2->left = p1; p2->right = p3;
+	p6->left = p5; p6->right = p7;
+	TreeNode *res=Convert(p4);
+	for (auto i = p1; i != NULL; i = i->right) {
+		cout << i->val << " -> ";
+	}
+	cout << endl;
+	for (auto i = p7; i != NULL; i = i->left) {
+		cout << " <-  "<<i->val ;
+	}
+	cout << endl;
+	for (auto i = p1; i != NULL; i = i->right) {
+		int k1= (i->left != NULL) ? i->left->val : 0;
+		int k2 = (i->right != NULL) ? i->right->val : 0;
+			cout << i->val << "left=" << k1 << "  " << i->val << "right=" << k2<<endl;
+	}
+};*/
+void mergearray(vector<int> &a, int first, int mid, int last, vector<int> &temp){
+	int i = first, j = mid + 1;
+	int m = mid, n = last;
+	int k = 0;
+	while (i <= m && j <= n){
+		if (a[i] <= a[j])
+			temp[k++] = a[i++];
+		else
+			temp[k++] = a[j++];
+	}
+	while (i <= m)
+		temp[k++] = a[i++];
+	while (j <= n)
+		temp[k++] = a[j++];
+	for (i = 0; i < k; i++)
+		a[first + i] = temp[i];
+}
+void mergesort(vector<int> &a, int first, int last, vector<int> &temp){
+	cout<<"sort:  "<< "first=" << first << "  " << "last=" << last << endl;
+	if (first < last){
+		int mid = (first + last) / 2;
+		mergesort(a, first, mid, temp);    //左边有序  
+		mergesort(a, mid + 1, last, temp); //右边有序  
+		mergearray(a, first, mid, last, temp); //再将二个有序数列合并  
+	}
+}
+int GetNumberOfK(vector<int> data, int k) {
+	int i = 1, j = 1, count_left = 0, count_right = 0;
+	int len = data.size() - 1;
+	int start = 0, end = len, mid;
+	while (start <= end) {
+		mid = (start + end) / 2;
+		if (data[mid]<k)start = mid + 1;
+		else if (data[mid]>k)end = mid - 1;
+		else {   
+			while (mid - i >= 0 && data[mid - i] == k) {
+				count_left++;
+				i++;
+			}
+			
+			while (mid + j <= len&&data[mid + j] == k) {
+				count_right++;
+				j++;
+			}
+			if (count_left == 0 && count_right == 0)return 1;
+			else return count_left + count_right + 1;
+		}
+	}
+	return  0;
+}
+vector<int> FindNumsAppearOnce(vector<int> data) { 
+	sort(data.begin(), data.end());    
+	int count = 2, i = 0; int k[2];   
+	while (count>0) {
+		if (data[i] == data[i + 1])i = i + 2;  
+		else { k[count - 1] = i;             
+		count--;             
+		i = i + 1;
+		} 
+	}   
+	vector<int> res;
+	res.push_back(data[k[0]]);   res.push_back(data[k[1]]);
+	return res;
+}
+int Findfirst(int num) {
+	int index = 0;
+	while (((num & 1) == 0) && (index < 8 * sizeof(int))) {
+		cout <<"num=" <<num<<"(num&1)="<<(num & 1) << endl;
+		num = num >> 1;
+		++index;
+	}
+	return index;
+}
+vector<vector<int> > FindContinuousSequence(int sum) {
+		int l = 1, r = 1, sumx = 1;
+		vector<vector<int> > ans;
+		while (l <= r) {
+			r++;
+			sumx += r;
+			cout << "left____=" << l << "  " << "right____=" << r <<" "<<"sumx____="<<sumx<<endl;
+			while (sumx > sum) {
+				sumx -= l;
+				l++;
+			}
+			cout << "left=" << l << "  " << "right=" << r << " " << "sumx=" << sumx << endl;
+			if (sumx == sum && l != r) {
+				vector<int> tmp;
+				for (int i = l; i <= r; i++)  tmp.push_back(i);
+				ans.push_back(tmp);
+			}
+		}
+		return ans;
+	}
+vector<int> FindNumbersWithSum(vector<int> array, int sum) {
+		vector<int>res;
+		int i = 0, j = array.size() - 1;
+		while (i<j) {
+			if (array[i] + array[j]>sum)j--;
+			else if (array[i] + array[j]<sum)i++;
+			else {
+				res.push_back(array[i]);
+				res.push_back(array[j]);
+				break;   //因为i和j相距越远，两个数的乘积越小，所以这就是最小乘积的两个数
+			}
+		}
+		return res;
+	}
+string ReverseSentence(string str) {
+	vector<string> word; string tmp; int count = 0; string res = "";
+	for (int i = 0; i<str.size(); i++) {
+		if (str[i] != ' ') {
+			tmp.push_back(str[i]); 
+		if(i==str.size()-1)word.push_back(tmp);
+		}
+		else {
+			word.push_back(tmp);
+			tmp = "";
+		}
+	}
+	for (int i = word.size() - 1; i >= 0; i--) {
+		if (i != 0) res += word[i] + " ";
+		else res += word[i];
+	}
+	return res;
+}
+bool IsContinuous(vector<int> numbers) {  //numbers[] 就是抓到的五张牌
+	if (numbers.size() != 5)return false;
+	sort(numbers.begin(), numbers.end());
+	int count = 0;
+	for (auto i : numbers) {
+		if (i == 0)count++;
+	}
+	if (numbers[4] - numbers[count] >= 5)return false;
+	else {   //再看看有没有重复的非0数字出现
+		for (int i = count; i<4; i++) {
+			if (numbers[i] == numbers[i + 1])return false;
+		}
+	}
+	return true;
+}
+int LastRemaining_Solution(int n, int m) {
+	if (n == 0 || m == 0)return -1;
+	ListNode *phead = new ListNode(0);
+	ListNode *pre = phead;
+	int c = 1;
+	while (c<n) {
+		ListNode *p2 = new ListNode(c);
+		pre->next = p2;
+		pre = p2; c++;
+	}
+	pre->next = phead;    //将链表首尾相连,形成环形
+	int count = 0;
+	ListNode *tmp = phead;
+	while (n != 1) {
+		count++;
+		if (count == m ) {           //m-1编号的同学实际上是第m个人
+			pre->next = tmp->next;
+			tmp = tmp->next;
+			n--;
+			count = 0;
+		}
+		else {
+			pre = tmp;
+			tmp = tmp->next;
+		}
+	}
+	return tmp->val;
+}
+vector<int> multiply(const vector<int>& A) {
+	for (auto i : A) {
+		cout << i << "  ";
+	}
+	int n = A.size() - 1; vector<int> B(n + 1,1);
+	for (auto i = 0; i <= n; i++) {
+		for (auto j = 0; j<i; j++) {
+			B[i] *= A[j]; cout <<"first="<< B[i] << endl;
+		}
+		for (auto k = i + 1; k <= n; k++) {
+			B[i] *= A[k]; cout << "second=" << B[i] << endl;
+		}
+	}
+	return B;
+}
+bool isNumeric(string str) {
+	string str_regex ("[\\+-]?[0-9]*(\\.[0-9]*)?([eE][\\+-]?[0-9]+)?");
+	regex pattern(str_regex);
+	smatch results;
+	return regex_match(str,results, pattern);
+}
+void Midorder(TreeNode* root, vector<TreeNode*> &vec) {
+	if (root == NULL)return;
+	Midorder(root->left, vec);
+	vec.push_back(root);
+	Midorder(root->right, vec);
+}
+TreeNode* KthNode(TreeNode* pRoot, int k) {
+	if (pRoot == NULL || k<1)return NULL;
+	vector<TreeNode*> vec;
+	Midorder(pRoot, vec);
+	auto i = vec.begin() + (k - 1);
+	return (k <= vec.size()) ? (*i) : NULL;
+}
+vector<int> maxInWindows(vector<int>& num, unsigned int size) {
+	vector<int> res; int index = 0;
+	if (size>num.size() || num.empty())return res;
+	for (; index + size <= num.size(); index++) {
+		int max_num = 0;
+		for (auto i = index; i<index + size - 1; i++) {
+			max_num = (num[i]<num[i + 1]) ? num[i + 1] : num[i];
+		}
+		res.push_back(max_num);
+	}
+	return res;
+}
+int getDigitSum(int num) {    //得到一个数字的位数之和
+	int sum = 0;
+	while (num>0) {
+		sum += num % 10;
+		num /= 10;
+	}
+	return sum;
+}
+bool check(int threshold, int rows, int cols, int row, int col, vector<bool> &visited) {  //判断机器人能否进入坐标为（row,col）的方格
+	if (row >= 0 && row<rows&&col >= 0 && col<cols
+		&&(getDigitSum(row) + getDigitSum(col) <= threshold)
+		&&!visited[row*cols + col]) {
+		return true;
+	}
+	return false;
+}
+int Countcore(int threshold, int rows, int cols, int row, int col, vector<bool> &visited) {
+	int count = 0;
+	if (check(threshold, rows, cols, row, col, visited)) {
+		visited[row*cols + col] = true;
+		count = 1 + Countcore(threshold, rows, cols, row - 1, col, visited) 
+			  + Countcore(threshold, rows, cols, row, col - 1, visited)
+			  + Countcore(threshold, rows, cols, row + 1, col, visited)
+			  + Countcore(threshold, rows, cols, row, col + 1, visited);
+	}
+	return count;
+}
+int movingCount(int threshold, int rows, int cols) {
+	vector<bool> visited(rows*cols, false);
+	int res = Countcore(threshold,rows,cols, 0, 0, visited);
+	return res;
+}
+void MaxHeapFixDown(vector<int> &A, int i, int n) {  //堆调整  （总结一下，就是取左右子节点中大的那个和父节点交换）
+	for (int j = 2 * i + 1; j < n; j = 2 * i + 1) {   //j每一次循环都从i的左子节点开始进行比较
+		if (j + 1 < n && A[j] < A[j + 1]) j++;   //如果左子结点小于右子结点，j指向右子结点 (2*i+1是左子节点，2*i+2是右子节点)
+		if (A[i]> A[j]) break;    //当父节点比子节点大，则跳出当前循环
+		else {
+			swap(A[i], A[j]); //如果子节点大于父节点，交换子节点和父节点（包括下标也要交换）
+			i = j;
+		}
+	}
+}
+void HeapSort(vector<int>& A, int n) {   //堆排序    
+//1.构建大顶堆
+	for (int i = n/ 2 - 1; i >= 0; i--) {      //从第一个非叶子结点（也就是非终端节点）从下至上，从右至左调整结构
+		MaxHeapFixDown(A, i, n);                 //第一个非叶子节点为 n/2-1（根节点开始从0开始标号，层序遍历，0,1,2,3,4,5,6...n-1）
+	}                                           //n 表示数组的长度                              
+	//此时，已经构造完成一个大顶堆了
+//2.调整堆结构+交换堆顶元素与末尾元素
+	for (int i = n - 1; i >= 1; i--) {  //将堆顶元素与末尾元素进行交换
+		swap(A[i], A[0]);
+		MaxHeapFixDown(A, 0, i);   //重新对堆进行调整，直接从根节点调整就行，因为其他的节点已经是大顶堆的结构
+	}
+}
+void shell_sort(vector<int>  &num) {   //希尔排序
+	for (int gap = num.size() / 2; gap > 0; gap = gap / 2) {  //确定增量的步长，也就是确定本次循环需要多少个子数组
+		for (int i = gap; i < num.size(); i++) {  // 每次循环选择一个子数组 	
+			for (int j = i - gap; j >= 0; j = j - gap) {   //在每一个子数组中使用插入排序
+				if(num[j] > num[j+gap]) swap(num[j+gap], num[j]);   
+			}                                          
+		}
+	}
+}
+void QuickSort(vector<int> &A,int left,int right) {
+	if (left>=right) return;  //递归出口
+		int pivot = A[left]; int i = left; int j = right;  //选择最左边第一个数为标准轴
+	while (i < j) {			
+		while (i < j && A[j] >= pivot) j--;	 //注意，正是因为选择左边第一个为标准轴，所以要先从右边的j开始判断，否则会出错的，
+		while (i < j && A[i] <= pivot) i++;	//因为考虑只有两个数的情况，要是从左开始判断会先让i++，导致i=j就不进行判断了
+		if (i < j) swap(A[i], A[j]);       //而且每次内层while循环都需要再对（i<j）进行判断，
+	}		                     //防止当i=1的时候，此时A[i]>pivot，而j=i+1，且A[j]>pivot,---> j--,此时j=i,但是此时A[j]>pivot
+		swap(A[left], A[j]);           //j依然会减1，出现j<i，也就是A[j]此时实际是标准值，
+		QuickSort(A, left, j - 1);         //再进行swap(A[i], A[j])会导致A[i]和标准轴pivot进行互换出现
+		QuickSort(A, j + 1, right);	
+}
+void Select_Sort(vector<int> &A) {
+	for (int i = 0; i < A.size(); i++) {
+		int min = i;
+		for (int j = i + 1; j < A.size(); j++) {
+			if (A[j] < A[min]) min = j;
+		}
+		swap(A[i], A[min]);
+	 }
+}
+void Insert_Sort(vector<int> &A) {
+	for (int i = 1; i < A.size(); i++) {
+		for (int j = i; j > 0; j--) {
+			if (A[j] < A[j - 1])swap(A[j], A[j - 1]);
+		}
+	}
+}
+void Bubble_Sort(vector<int> &A) {
+	for (int i = 0; i < A.size()-1; i++) {    //i的取值范围要注意一下，很容易弄错
+		for (int j = 0; j < A.size()-i-1; j++) {   //j的取值范围也要注意
+			if (A[j] > A[j + 1])swap(A[j], A[j + 1]);
+		}
+	}
+}
+int main() {
+	return 0;
+}
+ 
+
+
